@@ -73,12 +73,12 @@ const MyCourses = () => {
         try {
             await api.delete(`/instructor/courses/${courseToDelete.id}`);
             setCourses(courses.filter(c => c.id !== courseToDelete.id));
-            toast.success('Course deleted successfully');
+            toast.success('✅ Course deleted successfully');
             setDeleteModalOpen(false);
             setCourseToDelete(null);
         } catch (error) {
             console.error('Error deleting course:', error);
-            toast.error('Failed to delete course');
+            toast.error('❌ Failed to delete course. Please try again.');
         }
     };
 

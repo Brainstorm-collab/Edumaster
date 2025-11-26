@@ -38,7 +38,7 @@ const Register = () => {
 
         if (result.success) {
             setSuccess(true);
-            toast.success('Account created successfully! Redirecting...');
+            toast.success('🎉 Account created successfully! Redirecting to your dashboard...');
             // Auto-redirect after 2 seconds
             setTimeout(() => {
                 const userRole = result.user.role.toLowerCase();
@@ -46,7 +46,7 @@ const Register = () => {
             }, 2000);
         } else {
             setError(result.error);
-            toast.error(result.error || 'Registration failed');
+            toast.error('❌ ' + (result.error || 'Registration failed. Please try again.'));
         }
 
         setLoading(false);

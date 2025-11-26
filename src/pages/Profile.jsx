@@ -87,10 +87,10 @@ const Profile = () => {
             updateUser(response.data);
 
             setIsEditing(false);
-            toast.success('Profile updated successfully!');
+            toast.success('✅ Profile updated successfully!');
         } catch (error) {
             console.error('Error updating profile:', error);
-            toast.error('Failed to update profile');
+            toast.error('❌ Failed to update profile. Please try again.');
         } finally {
             setLoading(false);
         }

@@ -94,7 +94,7 @@ const CourseDetails = () => {
             return;
         }
         if (user.role !== 'STUDENT') {
-            toast.error('Only students can enroll in courses');
+            toast.error('❌ Only students can enroll in courses. Please switch to a student account.');
             return;
         }
         setEnrolling(true);
@@ -103,16 +103,16 @@ const CourseDetails = () => {
             if (res.data.requiresPayment) {
                 setEnrolled(true);
                 setIsPaid(false);
-                toast.success('Enrolled! Please complete payment to access content.');
+                toast.success('✅ Enrolled successfully! Please complete payment to access course content.');
                 setPaymentModalOpen(true);
             } else {
                 setEnrolled(true);
                 setIsPaid(true);
-                toast.success('Successfully enrolled!');
+                toast.success('🎉 Successfully enrolled in the course!');
             }
         } catch (err) {
             console.error('Enrollment error:', err);
-            toast.error(err.response?.data?.error || 'Failed to enroll. Please try again.');
+            toast.error('❌ ' + (err.response?.data?.error || 'Failed to enroll. Please try again.'));
         } finally {
             setEnrolling(false);
         }
@@ -128,10 +128,10 @@ const CourseDetails = () => {
             await api.post(`/student/pay/${id}`);
             setIsPaid(true);
             setPaymentModalOpen(false);
-            toast.success('Payment successful! You can now access the course.');
+            toast.success('💳 Payment successful! You can now access the full course content.');
         } catch (err) {
             console.error('Payment error:', err);
-            toast.error('Payment failed. Please try again.');
+            toast.error('❌ Payment failed. Please try again or contact support.');
         } finally {
             setProcessingPayment(false);
         }
@@ -145,10 +145,10 @@ const CourseDetails = () => {
             setCompletedAt(response.data.enrollment.completedAt);
             setProgress(response.data.enrollment.progress);
             if (!isCompleted) toast.success('🎉 Course marked as completed!');
-            else toast.info('Course completion unmarked');
+            else toast.info('ℹ️ Course marked as incomplete');
         } catch (error) {
             console.error('Error toggling completion:', error);
-            toast.error('Failed to update completion status');
+            toast.error('❌ Failed to update completion status. Please try again.');
         } finally {
             setTogglingCompletion(false);
         }
@@ -165,7 +165,7 @@ const CourseDetails = () => {
     // Persist per‑lesson completion toggle
     const toggleLessonCompletion = async (lessonId) => {
         if (!user) {
-            toast.error('You must be logged in to mark lessons as complete');
+            toast.error('❌ Please log in to mark lessons as complete.');
             return;
         }
 

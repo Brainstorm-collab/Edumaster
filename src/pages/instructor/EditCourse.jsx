@@ -66,11 +66,11 @@ const EditCourse = () => {
                 ...formData,
                 price: parseFloat(formData.price)
             });
-            toast.success('Course updated successfully!');
+            toast.success('✅ Course updated successfully!');
             fetchCourse(); // Refresh data
         } catch (error) {
             console.error('Error updating course:', error);
-            toast.error('Failed to update course');
+            toast.error('❌ Failed to update course. Please try again.');
         } finally {
             setSaving(false);
         }

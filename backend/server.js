@@ -247,10 +247,9 @@ app.get('/api/courses', async (req, res) => {
             const hours = Math.floor(totalMinutes / 60);
             const minutes = totalMinutes % 60;
             const durationString = hours > 0
-                ? `${hours}h ${minutes > 0 ? ` ${minutes}m` : ''}`
+                ? `${hours}h${minutes > 0 ? ` ${minutes}m` : ''}`
                 : `${minutes}m`;
 
-            // Remove sections from response to keep it light, but keep other data
             const { sections, ...courseData } = course;
             return {
                 ...courseData,
@@ -264,15 +263,18 @@ app.get('/api/courses', async (req, res) => {
     }
 });
 
-// Get course by ID (public - basic info only)
-// Get course by ID (public - basic info only)
+// Get single course details (public)
 app.get('/api/courses/:id', async (req, res) => {
     try {
+        const { id } = req.params;
         const course = await prisma.course.findUnique({
-            where: { id: req.params.id },
+            where: { id },
             include: {
                 instructor: {
                     select: { id: true, name: true, avatar: true, bio: true },
+                },
+                _count: {
+                    select: { enrollments: true, reviews: true },
                 },
                 sections: {
                     include: {
@@ -281,25 +283,25 @@ app.get('/api/courses/:id', async (req, res) => {
                                 id: true,
                                 title: true,
                                 duration: true,
-                                order: true,
                                 preview: true,
-                                // Don't include videoUrl for non-enrolled users
+                                order: true,
+                                description: true,
+                                videoUrl: true
                             },
-                            orderBy: { order: 'asc' },
-                        },
+                            orderBy: { order: 'asc' }
+                        }
                     },
-                    orderBy: { order: 'asc' },
+                    orderBy: { order: 'asc' }
                 },
                 reviews: {
+                    take: 5,
+                    orderBy: { createdAt: 'desc' },
                     include: {
                         user: {
-                            select: { name: true, avatar: true },
-                        },
-                    },
-                },
-                _count: {
-                    select: { enrollments: true, reviews: true },
-                },
+                            select: { name: true, avatar: true }
+                        }
+                    }
+                }
             },
         });
 
@@ -318,11 +320,10 @@ app.get('/api/courses/:id', async (req, res) => {
                 }
             });
         }
-
         const hours = Math.floor(totalMinutes / 60);
         const minutes = totalMinutes % 60;
         const durationString = hours > 0
-            ? `${hours}h ${minutes > 0 ? ` ${minutes}m` : ''}`
+            ? `${hours}h${minutes > 0 ? ` ${minutes}m` : ''}`
             : `${minutes}m`;
 
         res.json({
@@ -1094,6 +1095,48 @@ app.get('/api/quizzes/weekly', auth, authorize('STUDENT'), async (req, res) => {
     }
 });
 
+// Get single quiz by ID
+app.get('/api/quizzes/:id', auth, authorize('STUDENT'), async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const quiz = await prisma.quiz.findUnique({
+            where: { id },
+            include: {
+                questions: {
+                    select: {
+                        id: true,
+                        question: true,
+                        options: true,
+                        points: true,
+                        order: true
+                    },
+                    orderBy: { order: 'asc' }
+                },
+                course: {
+                    select: { id: true, title: true }
+                },
+                lesson: {
+                    select: { id: true, title: true }
+                },
+                attempts: {
+                    where: { userId: req.user.id },
+                    orderBy: { submittedAt: 'desc' },
+                    take: 1
+                }
+            }
+        });
+
+        if (!quiz) {
+            return res.status(404).json({ error: 'Quiz not found' });
+        }
+
+        res.json(quiz);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Submit quiz attempt
 app.post('/api/quizzes/:id/submit', auth, authorize('STUDENT'), async (req, res) => {
     try {
@@ -1510,9 +1553,172 @@ app.get('/api/instructor/my-courses', auth, authorize('INSTRUCTOR'), async (req,
     }
 });
 
+// Get instructor's students with progress
+app.get('/api/instructor/students', auth, authorize('INSTRUCTOR'), async (req, res) => {
+    try {
+        const instructorId = req.user.id;
+
+        // Get all courses by this instructor
+        const courses = await prisma.course.findMany({
+            where: { instructorId },
+            select: { id: true, title: true }
+        });
+
+        const courseIds = courses.map(c => c.id);
+
+        if (courseIds.length === 0) {
+            return res.json([]);
+        }
+
+        // Get all enrollments for these courses
+        const enrollments = await prisma.enrollment.findMany({
+            where: {
+                courseId: { in: courseIds },
+                paid: true
+            },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        avatar: true,
+                    }
+                },
+                course: {
+                    select: {
+                        id: true,
+                        title: true,
+                        sections: {
+                            select: {
+                                lessons: {
+                                    select: { id: true }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Process data
+        const studentsData = await Promise.all(enrollments.map(async (enrollment) => {
+            // Calculate lessons completed
+            const totalLessons = enrollment.course.sections.reduce((acc, section) => acc + section.lessons.length, 0);
+
+            // Count completed lessons
+            const completedLessonsCount = await prisma.progress.count({
+                where: {
+                    userId: enrollment.userId,
+                    completed: true,
+                    lesson: {
+                        section: {
+                            courseId: enrollment.course.id
+                        }
+                    }
+                }
+            });
+
+            // Get average quiz score for this course
+            const quizAttempts = await prisma.attempt.findMany({
+                where: {
+                    userId: enrollment.userId,
+                    quiz: {
+                        OR: [
+                            { courseId: enrollment.course.id },
+                            { lesson: { section: { courseId: enrollment.course.id } } }
+                        ]
+                    }
+                },
+                select: { score: true }
+            });
+
+            const avgQuizScore = quizAttempts.length > 0
+                ? Math.round(quizAttempts.reduce((sum, a) => sum + a.score, 0) / quizAttempts.length)
+                : 0;
+
+            // Determine status
+            let status = 'active';
+            if (enrollment.progress === 100) status = 'completed';
+
+            // Last active
+            const lastProgress = await prisma.progress.findFirst({
+                where: {
+                    userId: enrollment.userId,
+                    lesson: { section: { courseId: enrollment.course.id } }
+                },
+                orderBy: { completedAt: 'desc' }
+            });
+
+            const lastActiveDate = lastProgress?.completedAt || enrollment.enrolledAt;
+
+            return {
+                id: enrollment.user.id,
+                name: enrollment.user.name,
+                email: enrollment.user.email,
+                course: enrollment.course.title,
+                enrolled: enrollment.enrolledAt,
+                progress: enrollment.progress,
+                lessonsCompleted: completedLessonsCount,
+                totalLessons: totalLessons,
+                quizScore: avgQuizScore,
+                lastActive: lastActiveDate,
+                status: status
+            };
+        }));
+
+        res.json(studentsData);
+
+    } catch (error) {
+        console.error('Fetch students error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // ==================== ADMIN ROUTES ====================
 
-// Get all users
+// Get all courses (Admin)
+app.get('/api/admin/courses', auth, authorize('ADMIN'), async (req, res) => {
+    try {
+        const courses = await prisma.course.findMany({
+            include: {
+                instructor: {
+                    select: { name: true }
+                },
+                _count: {
+                    select: { enrollments: true, reviews: true }
+                },
+                reviews: {
+                    select: { rating: true }
+                }
+            }
+        });
+
+        const coursesWithStats = courses.map(course => {
+            const avgRating = course.reviews.length > 0
+                ? (course.reviews.reduce((sum, r) => sum + r.rating, 0) / course.reviews.length).toFixed(1)
+                : 0;
+
+            return {
+                id: course.id,
+                title: course.title,
+                instructor: course.instructor.name,
+                category: course.category,
+                status: course.published ? 'published' : 'draft',
+                students: course._count.enrollments,
+                lessons: 0,
+                rating: avgRating,
+                createdAt: course.createdAt
+            };
+        });
+
+        res.json(coursesWithStats);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get all users with detailed stats
 app.get('/api/admin/users', auth, authorize('ADMIN'), async (req, res) => {
     try {
         const users = await prisma.user.findMany({
@@ -1524,10 +1730,52 @@ app.get('/api/admin/users', auth, authorize('ADMIN'), async (req, res) => {
                 avatar: true,
                 bio: true,
                 createdAt: true,
+                updatedAt: true,
+                _count: {
+                    select: {
+                        enrollments: true,
+                        coursesCreated: true
+                    }
+                },
+                // For students: count completed courses
+                enrollments: {
+                    where: { completedAt: { not: null } },
+                    select: { id: true }
+                },
+                // For instructors: count total students across their courses
+                coursesCreated: {
+                    select: {
+                        _count: {
+                            select: { enrollments: true }
+                        }
+                    }
+                }
             },
+            orderBy: { createdAt: 'desc' }
         });
 
-        res.json(users);
+        // Transform data to be more frontend-friendly
+        const transformedUsers = users.map(user => {
+            const userData = {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                avatar: user.avatar,
+                bio: user.bio,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt,
+                stats: {
+                    coursesEnrolled: user._count.enrollments,
+                    coursesCreated: user._count.coursesCreated,
+                    coursesCompleted: user.enrollments.length,
+                    totalStudents: user.coursesCreated.reduce((sum, course) => sum + course._count.enrollments, 0)
+                }
+            };
+            return userData;
+        });
+
+        res.json(transformedUsers);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -1568,6 +1816,36 @@ app.delete('/api/admin/users/:id', auth, authorize('ADMIN'), async (req, res) =>
         });
 
         res.json({ message: 'User deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Update course status (Admin)
+app.put('/api/admin/courses/:id/status', auth, authorize('ADMIN'), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { published } = req.body;
+
+        const course = await prisma.course.update({
+            where: { id },
+            data: { published },
+        });
+
+        res.json(course);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Delete course (Admin)
+app.delete('/api/admin/courses/:id', auth, authorize('ADMIN'), async (req, res) => {
+    try {
+        await prisma.course.delete({
+            where: { id: req.params.id },
+        });
+
+        res.json({ message: 'Course deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

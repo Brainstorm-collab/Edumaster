@@ -32,7 +32,7 @@ const Certificates = () => {
 
     const handleDownload = (cert) => {
         // In a real app, this would generate and download a PDF
-        toast.info(`Downloading certificate for ${cert.courseTitle}...`);
+        toast.info(`📥 Downloading certificate for ${cert.courseTitle}...`);
     };
 
     const handleShare = (cert) => {
@@ -45,11 +45,11 @@ const Certificates = () => {
             }).catch(() => {
                 // Fallback: copy to clipboard
                 navigator.clipboard.writeText(shareText);
-                toast.success('Certificate link copied to clipboard!');
+                toast.success('📋 Certificate link copied to clipboard!');
             });
         } else {
             navigator.clipboard.writeText(shareText);
-            toast.success('Certificate link copied to clipboard!');
+            toast.success('📋 Certificate link copied to clipboard!');
         }
     };
 

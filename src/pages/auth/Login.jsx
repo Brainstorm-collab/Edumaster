@@ -28,11 +28,11 @@ const Login = () => {
     if (result.success) {
       // Navigate based on role
       const role = result.user.role.toLowerCase();
-      toast.success('Login successful! Welcome back.');
+      toast.success('🎉 Welcome back! Login successful.');
       navigate(`/${role}`);
     } else {
       setError(result.error);
-      toast.error(result.error || 'Invalid email or password');
+      toast.error('❌ ' + (result.error || 'Invalid email or password. Please try again.'));
     }
 
     setLoading(false);
@@ -64,11 +64,11 @@ const Login = () => {
     const result = await login(demoEmail, demoPassword);
 
     if (result.success) {
-      toast.success(`Logged in as ${role}!`);
+      toast.success(`🎉 Welcome! Logged in as ${role}.`);
       navigate(`/${role}`);
     } else {
       setError(result.error);
-      toast.error(result.error || 'Login failed');
+      toast.error('❌ ' + (result.error || 'Login failed. Please check your credentials.'));
     }
 
     setLoading(false);

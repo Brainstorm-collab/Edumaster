@@ -73,141 +73,153 @@ async function main() {
     // Create instructors one by one to get IDs
     const instructors = [];
     for (const data of instructorsData) {
-        thumbnail: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=450&fit=crop',
-            price: 1999,
-                level: 'BEGINNER',
-                    category: 'Web Development',
-                        published: true,
-                            instructorId: instructors[0].id,
-                                sections: [
-                                    {
-                                        title: 'Getting Started with React',
-                                        lessons: [
-                                            { title: 'Introduction to React', duration: '18 min', preview: true, videoUrl: 'https://www.youtube.com/embed/Tn6-PIqc4UM' },
-                                            { title: 'Setting Up Environment', duration: '22 min', preview: true, videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
-                                            { title: 'JSX and Components', duration: '28 min', preview: false, videoUrl: 'https://www.youtube.com/embed/Y6aYx_KKM7A' }
-                                        ]
-                                    },
-                                    {
-                                        title: 'React Fundamentals',
-                                        lessons: [
-                                            { title: 'Props and State', duration: '32 min', preview: false, videoUrl: 'https://www.youtube.com/embed/m7OWXtbiXX8' },
-                                            { title: 'Hooks: useState', duration: '38 min', preview: false, videoUrl: 'https://www.youtube.com/embed/O6P86uwfdR0' }
-                                        ]
-                                    }
-                                ]
-    },
-    {
-        title: 'Node.js & Express Backend Bootcamp',
-            slug: 'nodejs-express-backend-bootcamp',
-                description: 'Build scalable backend applications with Node.js, Express, MongoDB, and RESTful APIs.',
-                    longDescription: 'Learn professional backend development from scratch. Master Node.js fundamentals, Express framework, MongoDB database, authentication, and security.',
-                        thumbnail: 'https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=800&h=450&fit=crop',
-                            price: 2499,
-                                level: 'INTERMEDIATE',
-                                    category: 'Web Development',
-                                        published: true,
-                                            instructorId: instructors[0].id,
-                                                sections: [
-                                                    {
-                                                        title: 'Node.js Basics',
-                                                        lessons: [
-                                                            { title: 'Node.js Architecture', duration: '35 min', preview: true, videoUrl: 'https://www.youtube.com/embed/8aGhZQkoFbQ' },
-                                                            { title: 'Modules and NPM', duration: '28 min', preview: true, videoUrl: 'https://www.youtube.com/embed/TlB_eWDSMt4' }
-                                                        ]
-                                                    },
-                                                    {
-                                                        title: 'Express Framework',
-                                                        lessons: [
-                                                            { title: 'Express Routing', duration: '38 min', preview: false, videoUrl: 'https://www.youtube.com/embed/L72fhGm1tfE' },
-                                                            { title: 'Middleware', duration: '45 min', preview: false, videoUrl: 'https://www.youtube.com/embed/DZBGEVgL2eE' }
-                                                        ]
-                                                    }
-                                                ]
-    },
-    {
-        title: 'Data Science & Machine Learning with Python',
-            slug: 'data-science-ml-python',
-                description: 'Complete data science course covering Python, pandas, NumPy, visualization, and machine learning algorithms.',
-                    longDescription: 'Become a data scientist! Learn Python programming, data analysis with pandas, data visualization, statistics, and machine learning.',
-                        thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop',
-                            price: 2999,
-                                level: 'BEGINNER',
-                                    category: 'Data Science',
-                                        published: true,
-                                            instructorId: instructors[1].id,
-                                                sections: [
-                                                    {
-                                                        title: 'Python for Data Science',
-                                                        lessons: [
-                                                            { title: 'Python Basics', duration: '42 min', preview: true, videoUrl: 'https://www.youtube.com/embed/LHBE6Q9XlzI' },
-                                                            { title: 'NumPy Arrays', duration: '38 min', preview: true, videoUrl: 'https://www.youtube.com/embed/QUT1VHiLmmI' }
-                                                        ]
-                                                    },
-                                                    {
-                                                        title: 'Machine Learning',
-                                                        lessons: [
-                                                            { title: 'Intro to ML', duration: '32 min', preview: false, videoUrl: 'https://www.youtube.com/embed/7eh4d6sabA0' },
-                                                            { title: 'Linear Regression', duration: '45 min', preview: false, videoUrl: 'https://www.youtube.com/embed/nk2CQITm_eY' }
-                                                        ]
-                                                    }
-                                                ]
-    },
-    {
-        title: 'DevOps Engineering - Docker, Kubernetes & CI/CD',
-            slug: 'devops-docker-kubernetes-cicd',
-                description: 'Master DevOps practices, containerization, orchestration, and automated deployment pipelines.',
-                    longDescription: 'Learn industry-standard DevOps tools and practices. Master Docker, Kubernetes, Jenkins, GitHub Actions, monitoring, and cloud deployment.',
-                        thumbnail: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&h=450&fit=crop',
-                            price: 3499,
-                                level: 'ADVANCED',
-                                    category: 'DevOps',
-                                        published: true,
-                                            instructorId: instructors[2].id,
-                                                sections: [
-                                                    {
-                                                        title: 'Docker',
-                                                        lessons: [
-                                                            { title: 'Docker Fundamentals', duration: '35 min', preview: true, videoUrl: 'https://www.youtube.com/embed/fqMOX6JJhGo' },
-                                                            { title: 'Docker Compose', duration: '40 min', preview: false, videoUrl: 'https://www.youtube.com/embed/HB9V6PZcU7c' }
-                                                        ]
-                                                    },
-                                                    {
-                                                        title: 'Kubernetes',
-                                                        lessons: [
-                                                            { title: 'K8s Architecture', duration: '45 min', preview: false, videoUrl: 'https://www.youtube.com/embed/X48VuDVv0do' },
-                                                            { title: 'Deployments', duration: '38 min', preview: false, videoUrl: 'https://www.youtube.com/embed/R8_veQiYBjI' }
-                                                        ]
-                                                    }
-                                                ]
-    },
-    {
-        title: 'Cybersecurity Fundamentals & Ethical Hacking',
-            slug: 'cybersecurity-ethical-hacking',
-                description: 'Learn network security, penetration testing, and ethical hacking techniques to protect systems.',
-                    longDescription: 'Comprehensive cybersecurity course covering network security, cryptography, penetration testing, vulnerability assessment, and security best practices.',
-                        thumbnail: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&h=450&fit=crop',
-                            price: 2799,
-                                level: 'INTERMEDIATE',
-                                    category: 'Cybersecurity',
-                                        published: true,
-                                            instructorId: instructors[3].id,
-                                                sections: [
-                                                    {
-                                                        title: 'Network Security',
-                                                        lessons: [
-                                                            { title: 'Protocols', duration: '30 min', preview: true, videoUrl: 'https://www.youtube.com/embed/3QhU9jd03a0' },
-                                                            { title: 'Firewalls', duration: '35 min', preview: false, videoUrl: 'https://www.youtube.com/embed/AgHghB4f0zM' }
-                                                        ]
-                                                    },
-                                                    {
-                                                        title: 'Ethical Hacking',
-                                                        lessons: [
-                                                            { title: 'Penetration Testing', duration: '42 min', preview: false, videoUrl: 'https://www.youtube.com/embed/3Kq1MIfTWCE' }
-                                                        ]
-                                                    }
-                                                ]
+        const instructor = await prisma.user.create({ data });
+        instructors.push(instructor);
     }
+
+    console.log('✅ Created Instructors');
+
+    const coursesData = [
+        {
+            title: 'Modern React with Redux',
+            slug: 'modern-react-redux',
+            description: 'Master React and Redux with this comprehensive course.',
+            longDescription: 'Learn React from scratch, including Hooks, Redux, React Router, and more. Build real-world applications.',
+            thumbnail: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=450&fit=crop',
+            price: 1999,
+            level: 'BEGINNER',
+            category: 'Web Development',
+            published: true,
+            instructorId: instructors[0].id,
+            sections: [
+                {
+                    title: 'Getting Started with React',
+                    lessons: [
+                        { title: 'Introduction to React', duration: '18 min', preview: true, videoUrl: 'https://www.youtube.com/embed/Tn6-PIqc4UM' },
+                        { title: 'Setting Up Environment', duration: '22 min', preview: true, videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+                        { title: 'JSX and Components', duration: '28 min', preview: false, videoUrl: 'https://www.youtube.com/embed/Y6aYx_KKM7A' }
+                    ]
+                },
+                {
+                    title: 'React Fundamentals',
+                    lessons: [
+                        { title: 'Props and State', duration: '32 min', preview: false, videoUrl: 'https://www.youtube.com/embed/m7OWXtbiXX8' },
+                        { title: 'Hooks: useState', duration: '38 min', preview: false, videoUrl: 'https://www.youtube.com/embed/O6P86uwfdR0' }
+                    ]
+                }
+            ]
+        },
+        {
+            title: 'Node.js & Express Backend Bootcamp',
+            slug: 'nodejs-express-backend-bootcamp',
+            description: 'Build scalable backend applications with Node.js, Express, MongoDB, and RESTful APIs.',
+            longDescription: 'Learn professional backend development from scratch. Master Node.js fundamentals, Express framework, MongoDB database, authentication, and security.',
+            thumbnail: 'https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=800&h=450&fit=crop',
+            price: 2499,
+            level: 'INTERMEDIATE',
+            category: 'Web Development',
+            published: true,
+            instructorId: instructors[0].id,
+            sections: [
+                {
+                    title: 'Node.js Basics',
+                    lessons: [
+                        { title: 'Node.js Architecture', duration: '35 min', preview: true, videoUrl: 'https://www.youtube.com/embed/8aGhZQkoFbQ' },
+                        { title: 'Modules and NPM', duration: '28 min', preview: true, videoUrl: 'https://www.youtube.com/embed/TlB_eWDSMt4' }
+                    ]
+                },
+                {
+                    title: 'Express Framework',
+                    lessons: [
+                        { title: 'Express Routing', duration: '38 min', preview: false, videoUrl: 'https://www.youtube.com/embed/L72fhGm1tfE' },
+                        { title: 'Middleware', duration: '45 min', preview: false, videoUrl: 'https://www.youtube.com/embed/DZBGEVgL2eE' }
+                    ]
+                }
+            ]
+        },
+        {
+            title: 'Data Science & Machine Learning with Python',
+            slug: 'data-science-ml-python',
+            description: 'Complete data science course covering Python, pandas, NumPy, visualization, and machine learning algorithms.',
+            longDescription: 'Become a data scientist! Learn Python programming, data analysis with pandas, data visualization, statistics, and machine learning.',
+            thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop',
+            price: 2999,
+            level: 'BEGINNER',
+            category: 'Data Science',
+            published: true,
+            instructorId: instructors[1].id,
+            sections: [
+                {
+                    title: 'Python for Data Science',
+                    lessons: [
+                        { title: 'Python Basics', duration: '42 min', preview: true, videoUrl: 'https://www.youtube.com/embed/LHBE6Q9XlzI' },
+                        { title: 'NumPy Arrays', duration: '38 min', preview: true, videoUrl: 'https://www.youtube.com/embed/QUT1VHiLmmI' }
+                    ]
+                },
+                {
+                    title: 'Machine Learning',
+                    lessons: [
+                        { title: 'Intro to ML', duration: '32 min', preview: false, videoUrl: 'https://www.youtube.com/embed/7eh4d6sabA0' },
+                        { title: 'Linear Regression', duration: '45 min', preview: false, videoUrl: 'https://www.youtube.com/embed/nk2CQITm_eY' }
+                    ]
+                }
+            ]
+        },
+        {
+            title: 'DevOps Engineering - Docker, Kubernetes & CI/CD',
+            slug: 'devops-docker-kubernetes-cicd',
+            description: 'Master DevOps practices, containerization, orchestration, and automated deployment pipelines.',
+            longDescription: 'Learn industry-standard DevOps tools and practices. Master Docker, Kubernetes, Jenkins, GitHub Actions, monitoring, and cloud deployment.',
+            thumbnail: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&h=450&fit=crop',
+            price: 3499,
+            level: 'ADVANCED',
+            category: 'DevOps',
+            published: true,
+            instructorId: instructors[2].id,
+            sections: [
+                {
+                    title: 'Docker',
+                    lessons: [
+                        { title: 'Docker Fundamentals', duration: '35 min', preview: true, videoUrl: 'https://www.youtube.com/embed/fqMOX6JJhGo' },
+                        { title: 'Docker Compose', duration: '40 min', preview: false, videoUrl: 'https://www.youtube.com/embed/HB9V6PZcU7c' }
+                    ]
+                },
+                {
+                    title: 'Kubernetes',
+                    lessons: [
+                        { title: 'K8s Architecture', duration: '45 min', preview: false, videoUrl: 'https://www.youtube.com/embed/X48VuDVv0do' },
+                        { title: 'Deployments', duration: '38 min', preview: false, videoUrl: 'https://www.youtube.com/embed/R8_veQiYBjI' }
+                    ]
+                }
+            ]
+        },
+        {
+            title: 'Cybersecurity Fundamentals & Ethical Hacking',
+            slug: 'cybersecurity-ethical-hacking',
+            description: 'Learn network security, penetration testing, and ethical hacking techniques to protect systems.',
+            longDescription: 'Comprehensive cybersecurity course covering network security, cryptography, penetration testing, vulnerability assessment, and security best practices.',
+            thumbnail: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&h=450&fit=crop',
+            price: 2799,
+            level: 'INTERMEDIATE',
+            category: 'Cybersecurity',
+            published: true,
+            instructorId: instructors[3].id,
+            sections: [
+                {
+                    title: 'Network Security',
+                    lessons: [
+                        { title: 'Protocols', duration: '30 min', preview: true, videoUrl: 'https://www.youtube.com/embed/3QhU9jd03a0' },
+                        { title: 'Firewalls', duration: '35 min', preview: false, videoUrl: 'https://www.youtube.com/embed/AgHghB4f0zM' }
+                    ]
+                },
+                {
+                    title: 'Ethical Hacking',
+                    lessons: [
+                        { title: 'Penetration Testing', duration: '42 min', preview: false, videoUrl: 'https://www.youtube.com/embed/3Kq1MIfTWCE' }
+                    ]
+                }
+            ]
+        }
     ];
 
     const courses = [];

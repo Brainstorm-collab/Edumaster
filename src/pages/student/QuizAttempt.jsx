@@ -45,13 +45,13 @@ const QuizAttempt = () => {
             const response = await api.post(`/quizzes/${quiz.id}/submit`, { answers });
             setResult(response.data);
             if (response.data.passed) {
-                toast.success('Quiz passed! Great job!');
+                toast.success('🎉 Quiz passed! Great job!');
             } else {
-                toast.warning('Quiz completed. Keep practicing!');
+                toast.warning('⚠️ Quiz completed, but you didn\'t pass. Keep practicing!');
             }
         } catch (err) {
             console.error('Error submitting quiz:', err);
-            toast.error('Failed to submit quiz');
+            toast.error('❌ Failed to submit quiz. Please try again.');
         } finally {
             setSubmitting(false);
         }

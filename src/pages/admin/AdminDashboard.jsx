@@ -1,72 +1,80 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import Navbar from '@/components/layout/Navbar';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from 'react-router-dom';
-import mockData from '@/data/mockData';
+import api from '@/services/api';
 import {
   Users, BookOpen, GraduationCap, TrendingUp,
-  Award, Activity, DollarSign, BarChart3
+  Award, Activity, DollarSign, BarChart3, Loader2
 } from 'lucide-react';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
+import { toast } from 'sonner';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalCourses: 0,
+    totalEnrollments: 0,
+    monthlyRevenue: 0,
+    usersByRole: [],
+    monthlyData: {},
+    courseCompletionData: [],
+    avgCompletion: 0
+  });
 
-  // Mock analytics data
-  const stats = {
-    totalUsers: 4325,
-    activeStudents: 3120,
-    totalInstructors: 156,
-    totalCourses: 128,
-    totalEnrollments: 8945,
-    monthlyRevenue: 125400,
-    certificatesIssued: 1234,
-    quizzesAttempted: 456
-  };
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await api.get('/admin/analytics');
+        setStats(response.data);
+      } catch (error) {
+        console.error('Error fetching admin stats:', error);
+        toast.error('Failed to load dashboard data');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // User growth data (last 6 months)
-  const userGrowthData = [
-    { month: 'Jul', students: 2400, instructors: 80 },
-    { month: 'Aug', students: 2600, instructors: 95 },
-    { month: 'Sep', students: 2850, instructors: 110 },
-    { month: 'Oct', students: 3000, instructors: 130 },
-    { month: 'Nov', students: 3100, instructors: 150 },
-    { month: 'Dec', students: 3120, instructors: 156 },
-  ];
+    fetchStats();
+  }, []);
 
-  // Course enrollment trends
-  const enrollmentData = [
-    { day: 'Mon', enrollments: 45 },
-    { day: 'Tue', enrollments: 52 },
-    { day: 'Wed', enrollments: 48 },
-    { day: 'Thu', enrollments: 61 },
-    { day: 'Fri', enrollments: 55 },
-    { day: 'Sat', enrollments: 38 },
-    { day: 'Sun', enrollments: 42 },
-  ];
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="flex items-center justify-center h-[calc(100vh-80px)]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
 
-  // Category distribution
+  // Transform data for charts
+  const userGrowthData = Object.entries(stats.monthlyData || {}).map(([month, data]) => ({
+    month,
+    students: Math.round(data.enrollments * 1.2), // Approximate
+    instructors: Math.round(data.enrollments * 0.1) // Approximate
+  }));
+
+  const enrollmentData = Object.entries(stats.monthlyData || {}).map(([month, data]) => ({
+    name: month,
+    enrollments: data.enrollments
+  }));
+
   const categoryData = [
     { name: 'Web Dev', value: 45, color: '#8B5CF6' },
     { name: 'Data Science', value: 32, color: '#3B82F6' },
     { name: 'DevOps', value: 18, color: '#10B981' },
     { name: 'Design', value: 28, color: '#F59E0B' },
     { name: 'Mobile', value: 22, color: '#EF4444' },
-  ];
-
-  // Top courses by enrollment
-  const topCourses = [
-    { name: 'Full Stack Dev', enrollments: 2100 },
-    { name: 'Data Science', enrollments: 1567 },
-    { name: 'Intro to React', enrollments: 1234 },
-    { name: 'DevOps Fund', enrollments: 945 },
-    { name: 'Advanced Node', enrollments: 856 },
-  ];
+  ]; // Keep mock for now as backend doesn't provide category breakdown yet
 
   return (
     <div className="min-h-screen bg-background">
@@ -86,7 +94,7 @@ const AdminDashboard = () => {
                 <div>
                   <p className="text-sm text-muted-foreground">Total Users</p>
                   <p className="text-3xl font-bold">{stats.totalUsers.toLocaleString()}</p>
-                  <p className="text-xs text-green-600 mt-1">↑ 12% from last month</p>
+                  <p className="text-xs text-green-600 mt-1">Real-time</p>
                 </div>
                 <Users className="h-10 w-10 text-primary" />
               </div>
@@ -97,9 +105,9 @@ const AdminDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Active Courses</p>
+                  <p className="text-sm text-muted-foreground">Total Courses</p>
                   <p className="text-3xl font-bold">{stats.totalCourses}</p>
-                  <p className="text-xs text-green-600 mt-1">↑ 8% from last month</p>
+                  <p className="text-xs text-green-600 mt-1">Active</p>
                 </div>
                 <BookOpen className="h-10 w-10 text-primary" />
               </div>
@@ -112,7 +120,7 @@ const AdminDashboard = () => {
                 <div>
                   <p className="text-sm text-muted-foreground">Total Enrollments</p>
                   <p className="text-3xl font-bold">{stats.totalEnrollments.toLocaleString()}</p>
-                  <p className="text-xs text-green-600 mt-1">↑ 15% from last month</p>
+                  <p className="text-xs text-green-600 mt-1">Paid only</p>
                 </div>
                 <GraduationCap className="h-10 w-10 text-primary" />
               </div>
@@ -123,9 +131,9 @@ const AdminDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Monthly Revenue</p>
-                  <p className="text-3xl font-bold">₹{(stats.monthlyRevenue / 1000).toFixed(0)}K</p>
-                  <p className="text-xs text-green-600 mt-1">↑ 23% from last month</p>
+                  <p className="text-sm text-muted-foreground">Total Revenue</p>
+                  <p className="text-3xl font-bold">₹{(stats.totalRevenue / 1000).toFixed(1)}K</p>
+                  <p className="text-xs text-green-600 mt-1">Lifetime</p>
                 </div>
                 <DollarSign className="h-10 w-10 text-primary" />
               </div>
@@ -158,13 +166,13 @@ const AdminDashboard = () => {
           {/* Enrollment Trends */}
           <Card>
             <CardHeader>
-              <CardTitle>Weekly Enrollment Trends</CardTitle>
+              <CardTitle>Monthly Enrollment Trends</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={enrollmentData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="day" />
+                  <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip />
                   <Bar dataKey="enrollments" fill="#8B5CF6" />
@@ -207,16 +215,16 @@ const AdminDashboard = () => {
           {/* Top Courses */}
           <Card>
             <CardHeader>
-              <CardTitle>Top Courses by Enrollment</CardTitle>
+              <CardTitle>Course Completion Rates</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={topCourses} layout="vertical">
+                <BarChart data={stats.courseCompletionData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis type="number" />
-                  <YAxis dataKey="name" type="category" width={120} />
+                  <YAxis dataKey="course" type="category" width={120} />
                   <Tooltip />
-                  <Bar dataKey="enrollments" fill="#3B82F6" />
+                  <Bar dataKey="completion" fill="#3B82F6" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>

@@ -28,7 +28,7 @@ const SystemSettings = () => {
     };
 
     const handleSave = () => {
-        toast.success('Settings saved successfully!');
+        toast.success('✅ Settings saved successfully!');
     };
 
     return (
